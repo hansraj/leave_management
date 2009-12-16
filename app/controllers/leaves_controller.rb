@@ -33,7 +33,7 @@ class LeavesController < ApplicationController
   
      if @leave.save
        @link = url_for :controller => 'leaves', :action => 'edit', :id => @leave.id
-       Notifier.deliver_leave_details( @leave, @employee, @link )
+       LeaveNotifier.deliver_leave_details( @leave, @employee, @link )
        emp_lev_status = EmployeeLeaveStatus.find_by_employee_id_and_year( @employee.employee_id, Time.now.strftime("%Y").to_i )
        if emp_lev_status.remain_privilege <  @leave.no_of_days  and  @leave.type_of_leave == "privilege" 
         flash[:notice] = " Leave has been successfully applied and your #{@leave.no_of_days - emp_lev_status.remain_privilege } day's are Without pay "
@@ -60,13 +60,13 @@ class LeavesController < ApplicationController
       if session[:rolename] == "admin" and session[:department] == "Admin"
         @leave.status = params[:status]
         @leave.save        
-        Notifier.deliver_leave_status_updated( @leave, @leave.employee )
+        LeaveNotifier.deliver_leave_status_updated( @leave, @leave.employee )
         if @leave.status == "Approved" or @leave.status == "Rejected"
           update_employee_leave_status( @leave )
         end
       else
         @link = url_for :controller => 'leaves', :action => 'edit', :id => @leave.id
-        Notifier.deliver_leave_details( @leave, @employee, @link )
+        LeaveNotifier.deliver_leave_details( @leave, @employee, @link )
       end
       emp_lev_status = EmployeeLeaveStatus.find_by_employee_id_and_year( @employee.employee_id, Time.now.strftime("%Y").to_i )
       if emp_lev_status.remain_privilege <  @leave.no_of_days  and  @leave.type_of_leave == "privilege" and session[:rolename] != "admin"
