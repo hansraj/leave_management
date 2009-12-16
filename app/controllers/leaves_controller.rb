@@ -1,6 +1,6 @@
 class LeavesController < ApplicationController  
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-layout "vendor/plugins/employee_management/app/views/layouts/home.html.erb"
+  layout "layouts/plugins"
 
   def index       
     if session[:rolename] == "admin" and session[:department] == "Admin"      
@@ -17,8 +17,8 @@ layout "vendor/plugins/employee_management/app/views/layouts/home.html.erb"
   
   def new
     @leave = Leave.new        
+    @employee = User.find( session[:user_id] ).employee
 #@employee = Employee.find( session[:user_id] )
-    @employee = Employee.find(12) 
   end
   
   def show
@@ -34,29 +34,28 @@ layout "vendor/plugins/employee_management/app/views/layouts/home.html.erb"
      if @leave.save
        @link = url_for :controller => 'leaves', :action => 'edit', :id => @leave.id
        Notifier.deliver_leave_details( @leave, @employee, @link )
-       emp_lev_status = EmployeeLeaveStatus.find_by_employee_id_and_year( @employee.id, Time.now.strftime("%Y").to_i )
+       emp_lev_status = EmployeeLeaveStatus.find_by_employee_id_and_year( @employee.employee_id, Time.now.strftime("%Y").to_i )
        if emp_lev_status.remain_privilege <  @leave.no_of_days  and  @leave.type_of_leave == "privilege" 
         flash[:notice] = " Leave has been successfully applied and your #{@leave.no_of_days - emp_lev_status.remain_privilege } day's are Without pay "
-        redirect_to( :action => 'index', :id=>session[:user_id])
        else
         flash[:notice] = 'Leave has been successfully applied.'
-        redirect_to( :action => 'index', :id=>session[:user_id])
        end            
+        redirect_to leafe_path(@leave)
      else      
-      @employee.contact = params[:leave][:contact_no]
-      @employee.address = params[:leave][:address]
+      @employee.mobile = params[:leave][:contact_no]
+      @employee.current_address = params[:leave][:address]
       render :action => 'new'
      end
   end
   
   def edit        
     @leave = Leave.find(params[:id])
-    @employee = Employee.find( session[:user_id] )
+    @employee = User.find( session[:user_id] ).employee
   end
   
   def update
     @leave = Leave.find(params[:id])        
-    @employee = Employee.find( session[:user_id] )
+    @employee = User.find( session[:user_id] ).employee
     if @leave.update_attributes(params[:leave])
       if session[:rolename] == "admin" and session[:department] == "Admin"
         @leave.status = params[:status]
@@ -69,14 +68,13 @@ layout "vendor/plugins/employee_management/app/views/layouts/home.html.erb"
         @link = url_for :controller => 'leaves', :action => 'edit', :id => @leave.id
         Notifier.deliver_leave_details( @leave, @employee, @link )
       end
-      emp_lev_status = EmployeeLeaveStatus.find_by_employee_id_and_year( @employee.id, Time.now.strftime("%Y").to_i )
+      emp_lev_status = EmployeeLeaveStatus.find_by_employee_id_and_year( @employee.employee_id, Time.now.strftime("%Y").to_i )
       if emp_lev_status.remain_privilege <  @leave.no_of_days  and  @leave.type_of_leave == "privilege" and session[:rolename] != "admin"
         flash[:notice] = " Leave has been successfully updated and your #{@leave.no_of_days - emp_lev_status.remain_privilege } day's are Without pay "
-        redirect_to( :action => 'index', :id=>session[:user_id])
       else
         flash[:notice] = 'Leave has been successfully updated.'
-        redirect_to :action => 'index',   :id=>session[:user_id]
       end
+        redirect_to leafe_path(@leave)
     else
       render :action => 'edit'
     end

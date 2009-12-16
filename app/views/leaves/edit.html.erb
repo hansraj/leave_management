@@ -1,9 +1,14 @@
- <%= error_messages_for 'leave' %>
+<div id = "rightinner">
+  <div id = "titlegreenleft">
+    <div class="greentitle"><img src="/images/content.png" style="vertical-align:middle; margin-right:8px;" >Employee Management</div>
+  </div>
+   <br/><br/>
+   <div id = "matterinner">
 
 <h1 class="heading">Edit leave</h1>
 <hr>
  <table  width="100%" border="0" >
-<% form_for(:leave, @leave, :url=>{:action=>'update', :id => @leave }, :html=>{:multipart=>true}) do |form| %> 
+<% form_for( @leave, :url=> leafe_path( @leave ), :method => :put, :builder => BbFormBuilder ) do |form| %> 
 <tr>
     <td>
     <%= render :partial => 'form', :locals =>{ :new => false }%>
@@ -22,3 +27,9 @@
 </td>
 </tr>
 </table>
+  <br/> <br/>
+   </div>
+   <div id = "rightinnerbottom"></div>
+ </div>
+ <div style="clear:both"></div>
+
