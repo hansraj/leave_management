@@ -1,26 +1,14 @@
-<div id = "rightinner">
-  <div id = "titlegreenleft">
-    <div class="greentitle"><img src="/images/content.png" style="vertical-align:middle; margin-right:8px;" >Employee Management</div>
-  </div>
-   <br/><br/>
-   <div id = "matterinner">
-       <h1 class="heading">Leave Form  </h1><hr>
-       <table  width="100%" border="0" >
-       <% form_for( @leave, :url => leaves_path, :method => :post, :builder => BbFormBuilder ) do |form| %>
-       <tr  >
-       <td >
-       <%= render :partial => 'form', :locals =>{ :new => true } %>
-       </td>
-       </tr>
-       <tr >
-       <td ><%= submit_tag "Create", :class=>"button1" %></td>
-       <td ><a href="javascript:history.go(-1)"><%= image_tag("back",:border=>0)%></a></td>
-       </tr>
-       <%end%>
-       </table>
-             <br/> <br/>
-   </div>
-   <div id = "rightinnerbottom"></div>
- </div>
- <div style="clear:both"></div>
-
+    <h1 class="heading">Leave Form  </h1><hr>
+    <table  width="100%" border="0" >
+      <% form_for( @leave, :url => leaves_path, :method => :post, :builder => BbFormBuilder ) do |form| %> 
+      <tr>
+        <td >
+        <%= render :partial => 'form', :locals =>{ :new => true } %>
+        </td>
+      </tr>
+      <tr>
+        <td ><%= submit_tag "Create", :class=>"button1" %></td>
+        <td ><a href="javascript:history.go(-1)"><%= image_tag("back",:border=>0)%></a></td>
+      </tr>
+      <%end%>
+    </table>

@@ -3,15 +3,12 @@ class LeavesController < ApplicationController
   layout "layouts/plugins"
 
   def index       
-    if session[:rolename] == "admin" and session[:department] == "Admin"      
+    #if session[:rolename] == "admin" and session[:department] == "Admin"      
+    if current_user.role.title == 'Admin' 
       @emp_leaves = Leave.find(:all, :conditions =>['status =?',"Pending" ])      
-    elsif session[:rolename] == "admin" and session[:department] != "Admin"
-      @emp_leaves = Leave.find(:all, :conditions =>['status =?',"Pending" ])   
-      @leaves = Leave.paginate(:all, :conditions =>['employee_id =?', params[:id] ], :page => params[:page], :per_page => 10 )
-      @employee_leave_status = EmployeeLeaveStatus.find(:first, :conditions =>["employee_id = ? and year = ?",params[:id],Time.now.strftime("%Y").to_i])
-    elsif session[:rolename] != "admin"
-      @leaves = Leave.paginate(:all, :conditions =>['employee_id =?', params[:id] ], :page => params[:page], :per_page => 10 )
-      @employee_leave_status = EmployeeLeaveStatus.find(:first, :conditions =>["employee_id = ? and year = ?",params[:id],Time.now.strftime("%Y").to_i])
+    else
+      @leaves = Leave.paginate(:all, :conditions =>['employee_id =?', current_user.employee ], :page => params[:page], :per_page => 10 )
+      @employee_leave_status = EmployeeLeaveStatus.find(:first, :conditions =>["employee_id = ? and year = ?", current_user.employee ,Time.now.strftime("%Y").to_i])
     end    
   end
   
@@ -27,25 +24,28 @@ class LeavesController < ApplicationController
   
   def create       
    @leave = Leave.new(params[:leave])
-   @employee = Employee.find( session[:user_id] )
+   @employee = current_user.employee
+   @leave.employee = @employee
    @leave.status = "Pending"   
    @leave.date = Time.now.strftime("%m/%d/%Y")
-  
-     if @leave.save
-       @link = url_for :controller => 'leaves', :action => 'edit', :id => @leave.id
-       LeaveNotifier.deliver_leave_details( @leave, @employee, @link )
-       emp_lev_status = EmployeeLeaveStatus.find_by_employee_id_and_year( @employee.employee_id, Time.now.strftime("%Y").to_i )
-       if emp_lev_status.remain_privilege <  @leave.no_of_days  and  @leave.type_of_leave == "privilege" 
-        flash[:notice] = " Leave has been successfully applied and your #{@leave.no_of_days - emp_lev_status.remain_privilege } day's are Without pay "
-       else
-        flash[:notice] = 'Leave has been successfully applied.'
-       end            
+   if validate_emp_leave(@leave)
+    if @leave.save
+     @link = url_for :controller => 'leaves', :action => 'edit', :id => @leave.id
+#LeaveNotifier.deliver_leave_details( @leave, @employee, @link )
+     emp_lev_status = EmployeeLeaveStatus.find_by_employee_id_and_year( @employee, Time.now.strftime("%Y").to_i )
+     if emp_lev_status.remain_privilege <  @leave.no_of_days  and  @leave.type_of_leave == "privilege" 
+       flash[:notice] = " Leave has been successfully applied and your #{@leave.no_of_days - emp_lev_status.remain_privilege } day's are Without pay "
+     else
+       flash[:notice] = 'Leave has been successfully applied.'
+     end            
         redirect_to leafe_path(@leave)
-     else      
-      @employee.mobile = params[:leave][:contact_no]
+# redirect_to( :action => 'index', :id =>)
+   else      
       @employee.current_address = params[:leave][:address]
+      @employee.mobile = params[:leave][:contact_no]
       render :action => 'new'
      end
+   end            
   end
   
   def edit        
@@ -55,20 +55,20 @@ class LeavesController < ApplicationController
   
   def update
     @leave = Leave.find(params[:id])        
-    @employee = User.find( session[:user_id] ).employee
+    @employee = current_user.employee
     if @leave.update_attributes(params[:leave])
       if session[:rolename] == "admin" and session[:department] == "Admin"
         @leave.status = params[:status]
         @leave.save        
-        LeaveNotifier.deliver_leave_status_updated( @leave, @leave.employee )
+#LeaveNotifier.deliver_leave_status_updated( @leave, @leave.employee )
         if @leave.status == "Approved" or @leave.status == "Rejected"
           update_employee_leave_status( @leave )
         end
       else
         @link = url_for :controller => 'leaves', :action => 'edit', :id => @leave.id
-        LeaveNotifier.deliver_leave_details( @leave, @employee, @link )
+#        LeaveNotifier.deliver_leave_details( @leave, @employee, @link )
       end
-      emp_lev_status = EmployeeLeaveStatus.find_by_employee_id_and_year( @employee.employee_id, Time.now.strftime("%Y").to_i )
+      emp_lev_status = EmployeeLeaveStatus.find_by_employee_id_and_year( @employee, Time.now.strftime("%Y").to_i )
       if emp_lev_status.remain_privilege <  @leave.no_of_days  and  @leave.type_of_leave == "privilege" and session[:rolename] != "admin"
         flash[:notice] = " Leave has been successfully updated and your #{@leave.no_of_days - emp_lev_status.remain_privilege } day's are Without pay "
       else
@@ -93,17 +93,24 @@ class LeavesController < ApplicationController
   end
   
   def update_employee_leave_status( leave )    
-    @employee_leave_status = EmployeeLeaveStatus.find_by_employee_id(leave.employee_id)
-    if leave.type_of_leave == "privilege"
-      @employee_leave_status.remain_privilege = @employee_leave_status.total_privilege - leave.no_of_days
-    elsif leave.type_of_leave == "casual"
-      @employee_leave_status.remain_casual = @employee_leave_status.total_casual - leave.no_of_days
-    elsif leave.type_of_leave == "sick"
-      @employee_leave_status.remain_sick = @employee_leave_status.total_sick - leave.no_of_days
+    employee_leave_status = EmployeeLeaveStatus.find_by_employee_id(leave.employee_id)
+    if employee_leave_status
+      employee_leave_status.remain_privilege -= leave.no_of_days if leave.type_of_leave == "privilege"
+      employee_leave_status.remain_casual -= leave.no_of_days  if leave.type_of_leave == "casual"
+      employee_leave_status.remain_sick -= leave.no_of_days  if leave.type_of_leave == "sick"
+      employee_leave_status.save!
     end                
-     @employee_leave_status.save
   end
    
+  def validate_emp_leave( leave )    
+    emp_leave_status = EmployeeLeaveStatus.find_by_employee_id_and_year( @employee, Time.now.strftime("%Y").to_i )
+    if emp_leave_status
+      return ( emp_leave_status.remain_privilege >= leave.no_of_days ) if leave.type_of_leave == "privilege"
+      return ( emp_leave_status.remain_casual >= leave.no_of_days )  if leave.type_of_leave == "casual"
+      return ( emp_leave_status.remain_sick >= leave.no_of_days )  if leave.type_of_leave == "sick"
+    end                
+  end
+
   def emp_leave_status    
     if params[:status_year]
       @employee_leave_status = EmployeeLeaveStatus.paginate( :all, :conditions =>["year = ?", params[:status_year].to_i] , :page => params[:page], :per_page => 10)
@@ -170,4 +177,28 @@ class LeavesController < ApplicationController
     @leaves = Leave.find(:all, :conditions =>['employee_id =? and status =?', params[:id], "Approved" ], :order =>"date DESC")
   end  
  
+  def policy
+  end
+
+  def accept
+    leave = Leave.find(params[:id])
+    leave.status = 'Approved'
+    update_employee_leave_status( leave ) if leave.save!
+    if request.xhr? 
+      render :update do |page|        
+        page.replace_html "accept_reject_#{leave.id}", "<strong> Approved</strong>" 
+      end
+    end
+  end
+
+  def reject 
+    leave = Leave.find(params[:id])
+    leave.status = 'Rejected'
+    leave.save!
+    if request.xhr? 
+      render :update do |page|        
+        page.replace_html "accept_reject_#{leave.id}", "<strong> Rejected </strong>" 
+      end
+    end
+  end
 end

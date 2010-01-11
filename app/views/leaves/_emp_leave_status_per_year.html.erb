@@ -18,7 +18,7 @@
         <th width="11%" class="row_header">Total </th>            
         <th width="11%" class="row_header">Remain </th>            
     </tr>
-    <% if @employee_leave_status%>
+    <%# if @employee_leave_status %>
     <tr class="odd_row"> 	    
     <td><%= @employee_leave_status.total_sick + @employee_leave_status.total_casual + @employee_leave_status.total_privilege %></td>
     <td><%= @employee_leave_status.remain_sick + @employee_leave_status.remain_casual + @employee_leave_status.remain_privilege %></td>
@@ -29,6 +29,6 @@
     <td><%= @employee_leave_status.total_sick %></td>    
     <td><%= @employee_leave_status.remain_sick %></td>    
     </tr>
-    <% end %>
+    <%# end %>
   </table>
   

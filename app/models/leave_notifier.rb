@@ -1,3 +1,20 @@
+ActionMailer::Base.delivery_method = :sendmail
+  recipient = Recipient.find( :all )^M
+  i = 1
+  recipient.each do |email|
+    if recipient.size != i
+      @recipient_email = @recipient_email.to_s + email.recipient_email.to_s + ","
+    else
+      @recipient_email = @recipient_email.to_s + email.recipient_email.to_s
+    end
+      i = i +1
+  end
+RECIPIENT_EMAIL = @recipient_email
+
+ActiveSupport::CoreExtensions::Date::Conversions::DATE_FORMATS[:default]='%d/%m/%Y'
+
+
+
 class LeaveNotifier < ActionMailer::Base
   def leave_details( leave, employee, link)  
       @recipients = RECIPIENT_EMAIL

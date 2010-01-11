@@ -2,7 +2,7 @@
 
 <h1 class="heading">Edit leave status for <%= @employee_leave_status.employee.first_name %> <%= @employee_leave_status.employee.last_name %></h1>
 <hr>
-<% form_for(:employee_leave_status, @employee_leave_status, :url=>{:action=>'update_emp_leave_status', :id => @employee_leave_status }, :html=>{:multipart=>true}) do |form| %> 
+<% form_for(:employee_leave_status, @employee_leave_status, :url => update_emp_leave_status_leafe_path( @employee_leave_status )) do |form| %> 
 <table  width="100%" border="0" >
 <tr>
     <td>    
@@ -13,13 +13,11 @@
 </tr>
 <tr>
     <td>
-    <%= submit_tag 'Edit',:class=>"button1"%>
+    <%= submit_tag 'Edit' %>
    </td>
-</tr>
-<% end %>
-<tr>
       <td>
-<%= link_to link_to image_tag("back",:border=>0), :action => 'emp_leave_status' %>
+      <%= link_to link_to image_tag("back",:border=>0), :action => 'emp_leave_status' %>
 </td>
 </tr>
+<% end %>
 </table>

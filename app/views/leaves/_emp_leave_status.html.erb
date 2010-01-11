@@ -1,15 +1,14 @@
 <table align="right" width="100%" border="0" cellpadding="4" cellspacing="1">
-<% if session[:rolename] == "admin"%>
 
 	<tr class="row_header">
-    <th width="11%" class="row_header">Employee ID</th>
-    <th width="11%" class="row_header">Employee Name</th>
+    <th width="6%" class="row_header">ID</th>
+    <th width="11%" class="row_header">Name</th>
     <th width="11%" class="row_header"  colspan="2"> Privilege Leave</th>    
     <th width="15%" class="row_header" colspan="2">  Casual Leave</th>    
     <th width="15%" class="row_header" colspan="2">  Sick Leave</th>     
-    <th width="15%" class="row_header" colspan="2"> Total Leaves </th>             
-    <th width="15%" class="row_header">year</th>    
-  	<th colspan=2>&nbsp;</th>
+    <th width="15%" class="row_header" colspan="2"> Total </th>             
+    <th width="15%" class="row_header">Year</th>    
+  	<th colspan=2>Actions</th>
   </tr>
   <tr class="row_header">
         <th width="11%" class="row_header"> </th>
@@ -39,11 +38,10 @@
   <td><%= employee_leave_status.total_privilege + employee_leave_status.total_casual + employee_leave_status.total_sick %></td>        
   <td><%= employee_leave_status.remain_privilege + employee_leave_status.remain_casual + employee_leave_status.remain_sick %></td>        
   <td><%= employee_leave_status.year %></td>
-  <td><%= link_to image_tag( "edit" , :border => 0 ), :action => 'edit_emp_leave_status', :id => employee_leave_status %></td>  
+  <td><%= link_to "Edit",  edit_emp_leave_status_leafe_path(employee_leave_status) %></td>  
   <td><%= link_to link_to image_tag( "delete", :border => 0 ), { :action => 'delete_emp_leave_status', :id => employee_leave_status }, :confirm => 'Are you sure?', :method => :post  %></td>    
   </tr>
 <% end %>
  <tr><td colspan="12"><a href ="javascript:history.go(-1)"><%= image_tag("back",:border=>0)%></a></td></tr>  
 </table>
-<% end %>
 <%= will_paginate @employee_leave_status %>

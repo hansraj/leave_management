@@ -2,8 +2,9 @@
   <div id = "titlegreenleft">
     <div class="greentitle"><img src="/images/content.png" style="vertical-align:middle; margin-right:8px;" >Employee Management</div>
   </div>
-   <br/><br/>
-   <div id = "matterinner">
+  <br/><br/>
+  <div id = "matterinner">
+<br/>
 <table align="center" width="100%" border="0"  cellpadding="4" cellspacing="1">
   <tr class="odd_row">
     <td colspan=2 style="vertical-align:bottom;">
@@ -22,9 +23,10 @@
   <th align="center" colspan="2"><%= link_to 'Edit', edit_leafe_path(@leave) %> |<%= link_to 'Back', leaves_path %> <% if @leave.status == "Approved" or session[:rolename] == "admin" %>| <%= link_to 'Print Leave Form', print_leafe_path(@leave) %> <% end %></th>
 </tr>
 </table>
-  <br/> <br/>
-   </div>
-   <div id = "rightinnerbottom"></div>
- </div>
- <div style="clear:both"></div>
+ <br/> <br/>
+</div>
+<div id = "rightinnerbottom"></div>
+</div>
+<div style="clear:both"></div>
+
 

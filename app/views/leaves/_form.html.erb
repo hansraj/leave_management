@@ -8,11 +8,6 @@
         <fieldset>
         <legend>Leave Details</legend>
          <table>
-          <% if session[:rolename] == "admin" and  session[:department] != "Admin" %>          
-            <%= hidden_field 'leave', 'employee_id', :value=>session[:user_id] %>
-          <% elsif session[:rolename] != "admin" %>
-            <%= hidden_field 'leave', 'employee_id', :value=>session[:user_id] %>
-          <% end %>
             <% if new %>
             <tr><td>Leave Application Date </td><td> <%=text_field 'leave', 'date', :value => Time.now.strftime("%m/%d/%Y"), :size =>"20", :disabled=>"disabled"  %>  </td></tr>
             <% else %>          
@@ -28,13 +23,13 @@
             </tr></table>
             </td></tr>
             <% if new%>
-              <tr><td>Contact Tel. no  </td><td> <%= text_field 'leave', 'contact_no',:value =>@employee.contact,'size'=>'27' %></td></tr>
-              <tr><td>Address while on Leave </td><td>  <%= text_area 'leave', 'address', :value =>@employee.address,:size => "35x7" %></td></tr>
+              <tr><td>Contact Tel. no  </td><td> <%= text_field 'leave', 'contact_no',:value =>@employee.mobile,'size'=>'27' %></td></tr>
+              <tr><td>Address while on Leave </td><td>  <%= text_area 'leave', 'address', :value =>@employee.current_address,:size => "35x7" %></td></tr>
             <% else %>
               <tr><td>Contact Tel. no  </td><td> <%= text_field 'leave', 'contact_no','size'=>'27' %></td></tr>
               <tr><td>Address while on Leave </td><td>  <%= text_area 'leave', 'address',:size => "35x7" %></td></tr>
             <% end %>
-            <% if session[:rolename] == "admin" and session[:department] == "Admin" %>
+            <% if current_user.role.title == "Admin" and current_user.employee.departments.first.name == "Admin"%>
               <tr><td>Status </td>
                <td>
                 <%= radio_button_tag 'status', 'Pending', :checked =>"checked" %> Pending 
