@@ -7,7 +7,7 @@ system('nohup rake db:migrate &')
 mysql = Mysql.init()
 
 # change  the mysql connection parameters accordingly
-mysql.connect('localhost', 'root', '', 'ejosh_dev')
+mysql.connect('localhost', 'root', '', 'ejosh_dev1')
 
 mysql.query("update extensions set entry_point = '/leave_management' where id = #{ARGV} ;")
 

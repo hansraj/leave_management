@@ -1,4 +1,4 @@
-class CreateEmployeeManagement < ActiveRecord::Migration
+class CreateLeaveManagement < ActiveRecord::Migration
   create_table "leaves", :force => true do |t|
     t.column "employee_id",         :integer,                 :null => false
     t.column "date",                :date,                    :null => false

@@ -1,21 +1,15 @@
-<h1 class="heading">Edit leave</h1>
-<hr>
- <table  width="100%" border="0" >
+<br/><h3>Edit leave</h3><br/>
+<%= error_messages_for 'leave'  %>
 <% form_for( @leave, :url=> leafe_path( @leave ), :method => :put, :builder => BbFormBuilder ) do |form| %> 
-<tr>
-    <td>
-    <%= render :partial => 'form', :locals =>{ :new => false }%>
-   </td>
-</tr>
-<tr>
-    <td>
-    <%= submit_tag 'SAVE',:class=>"button1"%>
-   </td>
-</tr>
+  <table  width="100%" border="0" >
+    <tr>
+      <td>
+        <%= render :partial => 'form', :locals =>{ :new => false }%>
+      </td>
+    </tr>
+  </table>
+  <div>
+    <div class="greenbut" style="margin-left:0px;"><%= submit_tag 'Save', :class => "greensubbut"%></div>
+    <div class="greenbut" style="margin-left:20px;"><%= link_to 'Back', leaves_path %></div>	
+  </div>
 <% end %>
-<tr>
-  <td>
-<%= link_to link_to image_tag("show",:border=>0), leafe_path(@leave) %> |</td>
-<td ><a href="javascript:history.go(-1)"><%= image_tag("back",:border=>0)%></a></td>
-</tr>
-</table>

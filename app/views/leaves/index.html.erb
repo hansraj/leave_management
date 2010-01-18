@@ -1,29 +1,36 @@
- <% if session[:rolename] != "admin" %>
-  <h1 class="heading">Applied Leaves List</h1>
-  <% else %>
-  <h1 class="heading">Employees Pending Leaves</h1>
- <% end %>
-<hr> 
+<% if session[:rolename] != "admin" %>
+<% else %>
+<% end %>
 
-  <% if current_user.role.title == "Admin" and current_user.employee.departments.first.name == "Admin"%>
-    <div><%= link_to 'Employees Leaves Status', emp_leave_status_leaves_path,  :style => "text-decoration:none;" %></div> 
-    <%= render :partial => "emp_pending_leave" %>
-  <% elsif current_user.role.title == "admin" and current_user.employee.departments.first.name != "Admin"%>
-    <div>
-      <%= link_to 'Employees Leaves Status', emp_leave_status_leaves_path,  :style => "text-decoration:none;" %>
-      <%= link_to 'Apply for New Leave', new_leafe_path,  :style => "text-decoration:none;" %>
-    </div> 
-    <%= render :partial => "emp_pending_leave" %>
-    <h1 class="heading">Applied Leaves List</h1><hr>
-    <%= render :partial => "emp_leave_list" %>
-    <%= render :partial => "emp_leave_status_per_year" %>
-  <% elsif current_user.role.title != "admin" %>
-    <div>
-      <%= link_to 'Apply for New Leave', new_leafe_path,  :style => "text-decoration:none;" %>
-      <%#= link_to '<label style="cursor:pointer;">Leave Policy</label>'<<image_tag( 'add.gif', :border => 0 ), policy_leaves_path %>
-    </div> 
-    <%= render :partial => "emp_leave_list" %>
-    <%= render :partial => "emp_leave_status_per_year" %>
-  <% end %>
+<% if current_user.role.title == "Admin" and current_user.employee.departments.first.name == "Admin"%>
+  <div id="innerlinks"><%= link_to 'Employees Leaves Status', emp_leave_status_leaves_path %></div> 
+  <br/>
+  <h3>Employees Pending Leaves</h3>
+  <br/>
+  <%= render :partial => "emp_pending_leave" %>
+<% elsif current_user.role.title == "admin" and current_user.employee.departments.first.name != "Admin"%>
+  <div id="innerlinks">
+    <%= link_to 'Employees Leaves Status', emp_leave_status_leaves_path %>
+    <%= link_to 'Apply for New Leave', new_leave_path %>
+  </div> 
+  <br/>
+  <h3>Employees Pending Leaves</h3>
+  <br/>
+  <%= render :partial => "emp_pending_leave" %>
+  <br/> 
+  <h3>Applied Leaves List</h3>
+  <br/> 
+  <%= render :partial => "emp_leave_list" %>
+  <%= render :partial => "emp_leave_status_per_year" %>
+<% elsif current_user.role.title != "admin" %>
+  <div id="innerlinks">
+    <%= link_to 'Apply for New Leave', new_leafe_path %>
+    <%#= link_to '<label style="cursor:pointer;">Leave Policy</label>'<<image_tag( 'add.gif', :border => 0 ), policy_leaves_path %>
+  </div> 
+  <br/> 
+  <h3>Applied Leaves List</h3>
+  <br/> 
+  <%= render :partial => "emp_leave_list" %>
+  <%= render :partial => "emp_leave_status_per_year" %>
+<% end %>
 
-<a href ="javascript:history.go(-1)"><%= image_tag("back",:border=>0)%></a>
